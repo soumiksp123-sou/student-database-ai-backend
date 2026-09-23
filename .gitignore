@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+
+# Environment variables and secrets
+.env
+.env.*
+*.key
+
+# Database files
+students.db
+*.db
+
+# ChromaDB
+chroma_db/
+
+# Logs
+*.log
+
+# Jupyter / Colab
+.ipynb_checkpoints/
+.config/
+sample_data/
+
+# OS files
+.DS_Store
+Thumbs.db

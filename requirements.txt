@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+sqlalchemy
+pydantic[email]
+chromadb
+langchain
+langchain-core
+langchain-google-genai
+langgraph
+google-genai
+pyngrok
+requests
