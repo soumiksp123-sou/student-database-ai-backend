@@ -4,10 +4,6 @@ from .models import Student
 from .vector_store import add_student_to_vector_store
 
 
-# Create database tables
-Base.metadata.create_all(bind=engine)
-
-
 students_data = [
     {
         "name": "Aarav Sharma",
@@ -147,26 +143,27 @@ students_data = [
 ]
 
 
-db = SessionLocal()
+def initialize_database():
+    Base.metadata.create_all(bind=engine)
 
-try:
-    existing_count = db.query(Student).count()
+    db = SessionLocal()
 
-    if existing_count == 0:
+    try:
+        existing_count = db.query(Student).count()
 
-        for student_data in students_data:
-            student = Student(**student_data)
+        if existing_count == 0:
+            for student_data in students_data:
+                student = Student(**student_data)
 
-            db.add(student)
-            db.commit()
-            db.refresh(student)
+                db.add(student)
+                db.commit()
+                db.refresh(student)
 
-            add_student_to_vector_store(student)
+                add_student_to_vector_store(student)
 
-        print("15 students inserted successfully.")
+            print("15 students inserted successfully.")
+        else:
+            print(f"Database already contains {existing_count} students.")
 
-    else:
-        print(f"Database already contains {existing_count} students.")
-
-finally:
-    db.close()
+    finally:
+        db.close()

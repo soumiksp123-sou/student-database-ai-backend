@@ -7,9 +7,10 @@ from pydantic import BaseModel
 from .database import Base, engine, get_db
 from . import crud, schemas
 from .chatbot import ask_student_database
+from .seed import initialize_database
 
 
-Base.metadata.create_all(bind=engine)
+initialize_database()
 
 
 app = FastAPI(
