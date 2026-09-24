@@ -10,6 +10,7 @@ from .chatbot import ask_student_database
 from .seed import initialize_database
 
 
+# Initialize database when the application starts
 initialize_database()
 
 
@@ -20,6 +21,10 @@ app = FastAPI(
 )
 
 
+# ============================================
+# Request / Response Models
+# ============================================
+
 class ChatRequest(BaseModel):
     question: str
 
@@ -28,7 +33,12 @@ class ChatResponse(BaseModel):
     answer: str
 
 
-@app.get("/")
+# ============================================
+# Health Check
+# Supports GET and HEAD requests
+# ============================================
+
+@app.api_route("/", methods=["GET", "HEAD"])
 def root():
     return {
         "message": "Student Database API is running",
@@ -36,21 +46,42 @@ def root():
     }
 
 
-@app.get("/students/", response_model=list[schemas.StudentResponse])
+# ============================================
+# GET ALL STUDENTS
+# ============================================
+
+@app.get(
+    "/students/",
+    response_model=list[schemas.StudentResponse]
+)
 def get_students(
     skip: int = 0,
     limit: int = 100,
     db: Session = Depends(get_db)
 ):
-    return crud.get_students(db, skip=skip, limit=limit)
+    return crud.get_students(
+        db,
+        skip=skip,
+        limit=limit
+    )
 
 
-@app.get("/students/{student_id}", response_model=schemas.StudentResponse)
+# ============================================
+# GET STUDENT BY ID
+# ============================================
+
+@app.get(
+    "/students/{student_id}",
+    response_model=schemas.StudentResponse
+)
 def get_student(
     student_id: int,
     db: Session = Depends(get_db)
 ):
-    student = crud.get_student(db, student_id)
+    student = crud.get_student(
+        db,
+        student_id
+    )
 
     if not student:
         raise HTTPException(
@@ -61,6 +92,10 @@ def get_student(
     return student
 
 
+# ============================================
+# CREATE STUDENT
+# ============================================
+
 @app.post(
     "/students/",
     response_model=schemas.StudentResponse,
@@ -70,8 +105,15 @@ def create_student(
     student: schemas.StudentCreate,
     db: Session = Depends(get_db)
 ):
-    return crud.create_student(db, student)
+    return crud.create_student(
+        db,
+        student
+    )
 
+
+# ============================================
+# UPDATE STUDENT
+# ============================================
 
 @app.put(
     "/students/{student_id}",
@@ -97,7 +139,13 @@ def update_student(
     return updated_student
 
 
-@app.delete("/students/{student_id}")
+# ============================================
+# DELETE STUDENT
+# ============================================
+
+@app.delete(
+    "/students/{student_id}"
+)
 def delete_student(
     student_id: int,
     db: Session = Depends(get_db)
@@ -119,7 +167,14 @@ def delete_student(
     }
 
 
-@app.post("/chat/", response_model=ChatResponse)
+# ============================================
+# AI CHAT API
+# ============================================
+
+@app.post(
+    "/chat/",
+    response_model=ChatResponse
+)
 def chat(request: ChatRequest):
 
     if not request.question.strip():
@@ -129,7 +184,9 @@ def chat(request: ChatRequest):
         )
 
     try:
-        answer = ask_student_database(request.question)
+        answer = ask_student_database(
+            request.question
+        )
 
         return {
             "answer": answer
@@ -142,6 +199,15 @@ def chat(request: ChatRequest):
         )
 
 
-@app.get("/chat-ui", response_class=HTMLResponse)
+# ============================================
+# CHATBOT WEB UI
+# ============================================
+
+@app.get(
+    "/chat-ui",
+    response_class=HTMLResponse
+)
 def chat_ui():
-    return FileResponse("app/static/index.html")
+    return FileResponse(
+        "app/static/index.html"
+    )
